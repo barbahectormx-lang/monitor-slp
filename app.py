@@ -127,4 +127,17 @@ with c_redes:
     components.html("""
         <script type="text/javascript" src="https://ssl.gstatic.com/trends_nrtr/3620_RC01/embed_loader.js"></script>
         <script type="text/javascript">
-          trends.embed.renderExploreWidget("RELATED_QUERIES", {"comparison
+          trends.embed.renderExploreWidget("RELATED_QUERIES", {"comparisonItem":[{"keyword":"San Luis Potosi","geo":"MX-SLP","time":"now 1-d"}],"category":0,"property":""}, {"exploreQuery":"date=now%201-d&geo=MX-SLP&q=San%20Luis%20Potosi","guestPath":"https://trends.google.com:443/trends/embed/"});
+        </script>
+    """, height=300)
+
+    st.markdown("<p style='font-size:12px; color:#b700ff; margin-bottom:0;'>📱 POSTEOS RECIENTES</p>", unsafe_allow_html=True)
+    redes = buscar_noticias('"San Luis Potosí" site:twitter.com OR site:tiktok.com OR site:facebook.com', 4)
+    for r in redes:
+        titulo = r.get('title', r.title) if isinstance(r, dict) else r.title
+        link = r.get('link', r.link) if isinstance(r, dict) else r.link
+        st.markdown(f"<div class='social-card'><b>{titulo}</b><br><a href='{link}' target='_blank'>Ver publicación original ></a></div>", unsafe_allow_html=True)
+
+# --- 7. BOTÓN DE RECARGA ---
+if st.button("🔄 ACTUALIZAR SISTEMA C4"):
+    st.rerun()
