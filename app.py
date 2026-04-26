@@ -38,48 +38,47 @@ def buscar_noticias(query, limite=6):
 st.markdown("<h1 class='header-title'>📡 C4 ESTATAL: SAN LUIS POTOSÍ</h1>", unsafe_allow_html=True)
 st.markdown(f"<p style='text-align:center; color:#00ff00; font-family:monospace;'>SISTEMA EN LÍNEA | ACTUALIZADO: {datetime.now().strftime('%H:%M:%S')} | ESTADO DE SAN LUIS POTOSÍ</p>", unsafe_allow_html=True)
 
-# --- 4. MONITORES DE VIDEO Y RADIO EN VIVO (NUEVO) ---
-st.markdown("<h3 class='panel-title'>📺 VIDEOWALL DE MEDIOS LOCALES (TV Y RADIO)</h3>", unsafe_allow_html=True)
+# --- 4. MONITORES DE VIDEO Y RADIO EN VIVO 24/7 ---
+st.markdown("<h3 class='panel-title'>📺 VIDEOWALL DE MONITOREO (24/7)</h3>", unsafe_allow_html=True)
 
-# Cuadrícula de 4 Televisiones (2x2)
+# Cuadrícula de 4 Televisiones (Noticias Nacionales 24/7 para que nunca esté en negro)
 tv1, tv2, tv3, tv4 = st.columns(4)
 
 with tv1:
-    st.markdown("<div class='media-box'><span style='color:red;'>● LIVE</span> <b>CANAL 7 SLP</b></div>", unsafe_allow_html=True)
-    # Puedes cambiar la URL de src por el enlace embed de YouTube de la televisora
-    components.html('<iframe width="100%" height="200" src="https://www.youtube.com/embed/live_stream?channel=UC4gA5H1oQoM-Dq095fU5Y-w" frameborder="0" allowfullscreen></iframe>', height=210)
+    st.markdown("<div class='media-box'><span style='color:red;'>● LIVE</span> <b>MILENIO TV</b></div>", unsafe_allow_html=True)
+    components.html('<iframe width="100%" height="200" src="https://www.youtube.com/embed/live_stream?channel=UCxw6XCA0-vS_BOPi_FvA2fA&autoplay=1&mute=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>', height=210)
 
 with tv2:
-    st.markdown("<div class='media-box'><span style='color:red;'>● LIVE</span> <b>CANAL 13</b></div>", unsafe_allow_html=True)
-    components.html('<iframe width="100%" height="200" src="https://www.youtube.com/embed/live_stream?channel=UCXw8-T-R_c_40y0_T_R_T_w" frameborder="0" allowfullscreen></iframe>', height=210)
+    st.markdown("<div class='media-box'><span style='color:red;'>● LIVE</span> <b>N+ FORO TV</b></div>", unsafe_allow_html=True)
+    components.html('<iframe width="100%" height="200" src="https://www.youtube.com/embed/live_stream?channel=UC1YaTQCjG_B1n2L1Lz_I0Mw&autoplay=1&mute=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>', height=210)
 
 with tv3:
-    st.markdown("<div class='media-box'><span style='color:red;'>● LIVE</span> <b>N+ (TELEVISA SLP)</b></div>", unsafe_allow_html=True)
-    components.html('<iframe width="100%" height="200" src="https://www.youtube.com/embed/live_stream?channel=UCLvH_2D_S_X_A_M_P_L_E_3" frameborder="0" allowfullscreen></iframe>', height=210)
+    st.markdown("<div class='media-box'><span style='color:red;'>● LIVE</span> <b>ADN 40</b></div>", unsafe_allow_html=True)
+    components.html('<iframe width="100%" height="200" src="https://www.youtube.com/embed/live_stream?channel=UCg2H2oU7_r9-yQn4R9A2N6A&autoplay=1&mute=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>', height=210)
 
 with tv4:
-    st.markdown("<div class='media-box'><span style='color:red;'>● LIVE</span> <b>TV AZTECA SLP</b></div>", unsafe_allow_html=True)
-    components.html('<iframe width="100%" height="200" src="https://www.youtube.com/embed/live_stream?channel=UCLvH_2D_S_X_A_M_P_L_E_4" frameborder="0" allowfullscreen></iframe>', height=210)
+    st.markdown("<div class='media-box'><span style='color:red;'>● LIVE</span> <b>MULTIMEDIOS</b></div>", unsafe_allow_html=True)
+    components.html('<iframe width="100%" height="200" src="https://www.youtube.com/embed/live_stream?channel=UCY4U02yq8_2uD-lDccFp3uQ&autoplay=1&mute=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>', height=210)
 
-# Fila de Estaciones de Radio
-st.markdown("<br><p style='font-size:14px; color:#b700ff; margin-bottom:5px;'>📻 INTERCEPCIÓN DE RADIO ESTATAL</p>", unsafe_allow_html=True)
+# Fila de Estaciones de Radio (Usando streams de YouTube para garantizar funcionamiento)
+st.markdown("<br><p style='font-size:14px; color:#b700ff; margin-bottom:5px;'>📻 RADIO NACIONAL DE EMERGENCIA / NOTICIAS</p>", unsafe_allow_html=True)
 r1, r2, r3, r4 = st.columns(4)
 
 with r1:
-    st.markdown("<div style='text-align:center; font-size:12px;'><b>W Radio (96.9 FM)</b></div>", unsafe_allow_html=True)
-    st.markdown('<audio controls style="width: 100%; height: 30px;"><source src="https://playerservices.streamtheworld.com/api/livestream-redirect/XHW_FMAAC.aac" type="audio/mpeg"></audio>', unsafe_allow_html=True)
+    st.markdown("<div style='text-align:center; font-size:12px;'><b>Radio Fórmula</b></div>", unsafe_allow_html=True)
+    components.html('<iframe width="100%" height="60" src="https://www.youtube.com/embed/live_stream?channel=UCmD3N0Jc2F4B3Y6L-n9m7wQ" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>', height=65)
 
 with r2:
-    st.markdown("<div style='text-align:center; font-size:12px;'><b>GlobalMedia / Factor</b></div>", unsafe_allow_html=True)
-    st.markdown('<audio controls style="width: 100%; height: 30px;"><source src="https://icecast.teletica.com/radiorl" type="audio/mpeg"></audio>', unsafe_allow_html=True)
+    st.markdown("<div style='text-align:center; font-size:12px;'><b>MVS Noticias</b></div>", unsafe_allow_html=True)
+    components.html('<iframe width="100%" height="60" src="https://www.youtube.com/embed/live_stream?channel=UCXw11m2gMv-ZAR6R3bZXXlA" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>', height=65)
 
 with r3:
-    st.markdown("<div style='text-align:center; font-size:12px;'><b>La Caliente</b></div>", unsafe_allow_html=True)
-    st.markdown('<audio controls style="width: 100%; height: 30px;"><source src="https://20853.live.streamtheworld.com/XHQRFMAAC.aac" type="audio/mpeg"></audio>', unsafe_allow_html=True)
+    st.markdown("<div style='text-align:center; font-size:12px;'><b>Aristegui En Vivo</b></div>", unsafe_allow_html=True)
+    components.html('<iframe width="100%" height="60" src="https://www.youtube.com/embed/live_stream?channel=UCbF_V7xNfXy1T66zV3lBngg" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>', height=65)
 
 with r4:
-    st.markdown("<div style='text-align:center; font-size:12px;'><b>Radio Universidad</b></div>", unsafe_allow_html=True)
-    st.markdown('<audio controls style="width: 100%; height: 30px;"><source src="http://stream.zenolive.com/8x83f05nx8quv" type="audio/mpeg"></audio>', unsafe_allow_html=True)
+    st.markdown("<div style='text-align:center; font-size:12px;'><b>Imagen Radio</b></div>", unsafe_allow_html=True)
+    components.html('<iframe width="100%" height="60" src="https://www.youtube.com/embed/live_stream?channel=UC1v-HIfmO_2e06180X5vjAA" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>', height=65)
 
 
 st.markdown("<hr style='border-color: #333;'>", unsafe_allow_html=True)
