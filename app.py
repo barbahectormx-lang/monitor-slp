@@ -1,5 +1,6 @@
 import streamlit as st
 import feedparser
+import urllib.parse
 from datetime import datetime
 
 # --- 1. CONFIGURACIÓN DEL SISTEMA ---
@@ -19,14 +20,20 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. MOTORES DE BÚSQUEDA RSS (BLINDADOS CONTRA ERRORES) ---
+# --- 2. MOTOR RSS REPARADO ---
 def buscar_noticias(query):
+    # urllib.parse.quote asegura que los espacios y caracteres se conviertan a un formato web seguro (%20)
+    query_segura = urllib.parse.quote(query)
+    url = f"https://news.google.com/rss/search?q={query_segura}&hl=es-419&gl=MX&ceid=MX:es-419"
+    
     try:
-        url = f"https://news.google.com/rss/search?q={query}&hl=es-419&gl=MX&ceid=MX:es-419"
         feed = feedparser.parse(url)
+        # Si la lista de noticias viene vacía, no dejamos el espacio en blanco
+        if len(feed.entries) == 0:
+            return [{"title": "📡 Escaneando fuentes locales... (Sin resultados recientes)", "link": url}]
         return feed.entries[:6]
     except:
-        return []
+        return [{"title": "⚠️ Enlace de comunicación interrumpido.", "link": "#"}]
 
 # --- 3. CABECERA ---
 st.markdown("<h1 class='header-title'>📡 C4 ESTATAL: SAN LUIS POTOSÍ</h1>", unsafe_allow_html=True)
@@ -37,7 +44,6 @@ c_trafico, c_clima = st.columns(2)
 
 with c_trafico:
     st.markdown("<h3 class='panel-title'>🚗 TRÁFICO Y VIALIDAD (EN VIVO)</h3>", unsafe_allow_html=True)
-    # Radar oficial de Waze para SLP
     st.components.v1.html("""
         <iframe src="https://embed.waze.com/iframe?zoom=13&lat=22.1565&lon=-100.9855&ct=livemap" 
         width="100%" height="400" allowfullscreen style="border: 1px solid #333; border-radius: 5px;"></iframe>
@@ -45,7 +51,6 @@ with c_trafico:
 
 with c_clima:
     st.markdown("<h3 class='panel-title'>⛈️ RADAR METEOROLÓGICO ESTATAL</h3>", unsafe_allow_html=True)
-    # Radar oficial de Windy (Muestra lluvia/clima en todo el estado)
     st.components.v1.html("""
         <iframe width="100%" height="400" 
         src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=%C2%B0C&metricWind=km/h&zoom=7&overlay=rain&product=ecmwf&level=surface&lat=22.156&lon=-100.985" 
@@ -54,28 +59,36 @@ with c_clima:
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# --- 5. MONITORES DE INTELIGENCIA (NOTICIAS, GOBIERNO, REDES) ---
+# --- 5. MONITORES DE INTELIGENCIA ---
 c_noticias, c_gobierno, c_redes = st.columns(3)
 
 with c_noticias:
     st.markdown("<h3 class='panel-title'>📰 TENDENCIAS GLOBALES</h3>", unsafe_allow_html=True)
-    noticias = buscar_noticias("San Luis Potosí when:12h")
+    # Búsqueda general limpia
+    noticias = buscar_noticias("San Luis Potosi noticias hoy")
     for n in noticias:
-        st.markdown(f"<div class='news-card'><b>{n.title}</b><br><a href='{n.link}'>Leer reporte ></a></div>", unsafe_allow_html=True)
+        # Se verifica si es un diccionario (el mensaje de error) o un objeto de feedparser
+        titulo = n.get('title', n.title) if isinstance(n, dict) else n.title
+        link = n.get('link', n.link) if isinstance(n, dict) else n.link
+        st.markdown(f"<div class='news-card'><b>{titulo}</b><br><a href='{link}' target='_blank'>Leer reporte ></a></div>", unsafe_allow_html=True)
 
 with c_gobierno:
     st.markdown("<h3 class='panel-title'>🏛️ DEPENDENCIAS Y GOBIERNO</h3>", unsafe_allow_html=True)
-    # Busca específicamente cuentas de gobierno
-    gobierno = buscar_noticias("(Gobierno de San Luis Potosí OR Ayuntamiento SLP OR Seguridad SLP OR Protección Civil SLP) when:24h")
+    # Búsqueda enfocada a comunicados, ayuntamiento y seguridad
+    gobierno = buscar_noticias("Gobierno San Luis Potosi seguridad ayuntamiento comunicado")
     for g in gobierno:
-        st.markdown(f"<div class='gov-card'><b>{g.title}</b><br><a href='{g.link}'>Ver boletín ></a></div>", unsafe_allow_html=True)
+        titulo = g.get('title', g.title) if isinstance(g, dict) else g.title
+        link = g.get('link', g.link) if isinstance(g, dict) else g.link
+        st.markdown(f"<div class='gov-card'><b>{titulo}</b><br><a href='{link}' target='_blank'>Ver boletín ></a></div>", unsafe_allow_html=True)
 
 with c_redes:
     st.markdown("<h3 class='panel-title'>📱 RASTREO EN REDES SOCIALES</h3>", unsafe_allow_html=True)
-    # Busca menciones virales o problemas sociales recientes
-    redes = buscar_noticias('"San Luis Potosí" (viral OR redes sociales OR Twitter OR Facebook OR TikTok OR denuncia) when:24h')
+    # Búsqueda enfocada a denuncias ciudadanas y contenido viral del estado
+    redes = buscar_noticias("San Luis Potosi viral denuncia redes sociales")
     for r in redes:
-        st.markdown(f"<div class='social-card'><b>{r.title}</b><br><a href='{r.link}'>Rastrear fuente ></a></div>", unsafe_allow_html=True)
+        titulo = r.get('title', r.title) if isinstance(r, dict) else r.title
+        link = r.get('link', r.link) if isinstance(r, dict) else r.link
+        st.markdown(f"<div class='social-card'><b>{titulo}</b><br><a href='{link}' target='_blank'>Rastrear fuente ></a></div>", unsafe_allow_html=True)
 
 # --- 6. BOTÓN DE SINCRONIZACIÓN ---
 if st.button("🔄 FORZAR SINCRONIZACIÓN DE DATOS"):
