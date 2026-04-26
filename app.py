@@ -1,61 +1,62 @@
 import streamlit as st
 import pandas as pd
-import pydeck as pdk
-import feedparser # Esta herramienta lee las noticias
+import folium
+from streamlit_folium import st_folium
+import feedparser
 from datetime import datetime
 
-st.set_page_config(layout="wide", page_title="MONITOR SLP PRO", page_icon="🇲🇽")
+# Configuración de pantalla completa
+st.set_page_config(layout="wide", page_title="MONITOR SLP", page_icon="🇲🇽")
 
-# --- LECTOR DE NOTICIAS REALES DE SLP ---
-def obtener_noticias():
-    # Leemos el feed de Google News para San Luis Potosi
-    url = "https://news.google.com/rss/search?q=San+Luis+Potosi+cuando:24h&hl=es-419&gl=MX&ceid=MX:es-419"
-    feed = feedparser.parse(url)
-    noticias = []
-    for entry in feed.entries[:10]: # Solo las 10 más recientes
-        noticias.append({
-            'titulo': entry.title,
-            'link': entry.link,
-            'fecha': entry.published
-        })
-    return noticias
+# Estilo oscuro para la interfaz
+st.markdown("<style>body {background-color: #0e1117; color: white;}</style>", unsafe_allow_html=True)
 
-noticias_reales = obtener_noticias()
+st.title("🛰️ SISTEMA DE INTELIGENCIA: SAN LUIS POTOSÍ")
 
-# --- INTERFAZ ---
-st.title("🛰️ SISTEMA DE INTELIGENCIA SLP")
+# --- FUNCIÓN PARA NOTICIAS REALES DE SLP ---
+def get_slp_news():
+    # Buscamos noticias de las últimas 24h en San Luis Potosí
+    feed_url = "https://news.google.com/rss/search?q=San+Luis+Potosi+when:24h&hl=es-419&gl=MX&ceid=MX:es-419"
+    feed = feedparser.parse(feed_url)
+    return feed.entries[:8] # Tomamos las 8 más recientes
 
-col1, col2 = st.columns([3, 1])
+# --- DISEÑO DE COLUMNAS ---
+col_mapa, col_noticias = st.columns([2, 1])
 
-with col1:
-    # Mapa configurado para que NO se vea negro
-    st.pydeck_chart(pdk.Deck(
-        map_style='mapbox://styles/mapbox/navigation-night-v1', # Estilo navegación nocturna
-        initial_view_state=pdk.ViewState(
-            latitude=22.1565,
-            longitude=-100.9855,
-            zoom=8,
-            pitch=45,
-        ),
-        layers=[
-            pdk.Layer(
-                'ScatterplotLayer',
-                data=pd.DataFrame({'lat': [22.15], 'lon': [-100.98]}), # Punto central
-                get_position='[lon, lat]',
-                get_color='[255, 0, 0, 160]',
-                get_radius=2000,
-            ),
-        ],
-    ))
+with col_mapa:
+    st.subheader("📍 Mapa de Eventos Recientes")
+    # Crear el mapa base centrado en SLP
+    # Usamos CartoDB Dark Matter para que se vea estilo "World Monitor" (Oscuro)
+    m = folium.Map(location=[22.1565, -100.9855], zoom_start=8, tiles='CartoDB dark_matter')
+    
+    # Añadimos un marcador de ejemplo en la capital
+    folium.CircleMarker(
+        location=[22.1565, -100.9855],
+        radius=10,
+        color='red',
+        fill=True,
+        fill_color='red',
+        popup='Zona de Monitoreo Central'
+    ).add_to(m)
 
-with col2:
-    st.subheader("🔥 Tendencias Ahora")
-    for n in noticias_reales:
-        st.markdown(f"📌 **[{n['titulo']}]({n['link']})**")
-        st.caption(f"Publicado: {n['fecha']}")
-        st.write("---")
+    # Renderizar el mapa
+    st_folium(m, width=1000, height=500)
 
-# Panel Lateral mejorado
-st.sidebar.title("LOG DE EVENTOS")
-st.sidebar.success("Conectado a Satélite: Activo")
-st.sidebar.info(f"Último escaneo: {datetime.now().strftime('%d/%m/%Y %H:%M')}")
+with col_noticias:
+    st.subheader("🔥 Noticias y Tendencias")
+    noticias = get_slp_news()
+    
+    if not noticias:
+        st.write("Buscando señales de inteligencia...")
+    else:
+        for n in noticias:
+            with st.expander(f"⚠️ {n.title[:60]}..."):
+                st.write(n.title)
+                st.caption(f"Publicado: {n.published}")
+                st.markdown(f"[Leer reporte completo]({n.link})")
+
+# --- BARRA LATERAL ---
+st.sidebar.title("ESTADO DEL SISTEMA")
+st.sidebar.info(f"📡 Satélite: ONLINE\n\n⏰ Actualizado: {datetime.now().strftime('%H:%M:%S')}")
+st.sidebar.markdown("---")
+st.sidebar.warning("Este monitor agrupa noticias locales automáticamente para el estado de San Luis Potosí.")
