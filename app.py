@@ -1,67 +1,61 @@
 import streamlit as st
 import pandas as pd
 import pydeck as pdk
+import feedparser # Esta herramienta lee las noticias
 from datetime import datetime
 
-# Configuración visual de la página
-st.set_page_config(layout="wide", page_title="MONITOR SLP", page_icon="🇲🇽")
+st.set_page_config(layout="wide", page_title="MONITOR SLP PRO", page_icon="🇲🇽")
 
-# Estilo de mapa oscuro tipo World Monitor
-st.markdown("""
-    <style>
-    .main { background-color: #0e1117; }
-    .stTitle { color: #ff4b4b; font-family: 'Courier New'; }
-    </style>
-    """, unsafe_allow_html=True)
+# --- LECTOR DE NOTICIAS REALES DE SLP ---
+def obtener_noticias():
+    # Leemos el feed de Google News para San Luis Potosi
+    url = "https://news.google.com/rss/search?q=San+Luis+Potosi+cuando:24h&hl=es-419&gl=MX&ceid=MX:es-419"
+    feed = feedparser.parse(url)
+    noticias = []
+    for entry in feed.entries[:10]: # Solo las 10 más recientes
+        noticias.append({
+            'titulo': entry.title,
+            'link': entry.link,
+            'fecha': entry.published
+        })
+    return noticias
 
-st.title("🛰️ SISTEMA DE MONITOREO SAN LUIS POTOSÍ")
-st.subheader("Inteligencia de Fuentes Abiertas en Tiempo Real")
+noticias_reales = obtener_noticias()
 
-# --- DATOS DE EJEMPLO (Esto es lo que verás en el mapa) ---
-# Aquí puedes editar los textos entre comillas para cambiar las alertas
-datos_alertas = pd.DataFrame({
-    'lat': [22.1565, 22.1450, 21.9833, 22.4883, 21.4833],
-    'lon': [-100.9855, -101.0100, -99.0167, -100.6333, -98.8833],
-    'evento': ['Bloqueo Vial - Carranza', 'Alerta de Lluvia - Centro', 'Incendio Forestal - Huasteca', 'Accidente - Matehuala', 'Reporte Ciudadano - Xilitla'],
-    'gravedad': [100, 50, 200, 150, 80] # Tamaño del punto
-})
+# --- INTERFAZ ---
+st.title("🛰️ SISTEMA DE INTELIGENCIA SLP")
 
-# --- EL MAPA ---
-st.pydeck_chart(pdk.Deck(
-    map_style='mapbox://styles/mapbox/dark-v10',
-    initial_view_state=pdk.ViewState(
-        latitude=22.1565,
-        longitude=-100.9855,
-        zoom=7,
-        pitch=45,
-    ),
-    layers=[
-        pdk.Layer(
-            'ScatterplotLayer',
-            data=datos_alertas,
-            get_position='[lon, lat]',
-            get_color='[255, 75, 75, 180]',
-            get_radius='gravedad * 100',
+col1, col2 = st.columns([3, 1])
+
+with col1:
+    # Mapa configurado para que NO se vea negro
+    st.pydeck_chart(pdk.Deck(
+        map_style='mapbox://styles/mapbox/navigation-night-v1', # Estilo navegación nocturna
+        initial_view_state=pdk.ViewState(
+            latitude=22.1565,
+            longitude=-100.9855,
+            zoom=8,
+            pitch=45,
         ),
-        pdk.Layer(
-            'TextLayer',
-            data=datos_alertas,
-            get_position='[lon, lat]',
-            get_text='evento',
-            get_color=[255, 255, 255],
-            get_size=16,
-            get_alignment_baseline="'bottom'",
-        )
-    ],
-))
+        layers=[
+            pdk.Layer(
+                'ScatterplotLayer',
+                data=pd.DataFrame({'lat': [22.15], 'lon': [-100.98]}), # Punto central
+                get_position='[lon, lat]',
+                get_color='[255, 0, 0, 160]',
+                get_radius=2000,
+            ),
+        ],
+    ))
 
-# --- PANEL LATERAL ---
-st.sidebar.image("https://cdn-icons-png.flaticon.com/512/854/854878.png", width=100)
+with col2:
+    st.subheader("🔥 Tendencias Ahora")
+    for n in noticias_reales:
+        st.markdown(f"📌 **[{n['titulo']}]({n['link']})**")
+        st.caption(f"Publicado: {n['fecha']}")
+        st.write("---")
+
+# Panel Lateral mejorado
 st.sidebar.title("LOG DE EVENTOS")
-st.sidebar.info(f"Última actualización: {datetime.now().strftime('%H:%M:%S')}")
-
-for i, row in datos_alertas.iterrows():
-    st.sidebar.warning(f"⚠️ {row['evento']}")
-
-st.sidebar.markdown("---")
-st.sidebar.write("Desarrollado para monitoreo estatal en San Luis Potosí.")
+st.sidebar.success("Conectado a Satélite: Activo")
+st.sidebar.info(f"Último escaneo: {datetime.now().strftime('%d/%m/%Y %H:%M')}")
